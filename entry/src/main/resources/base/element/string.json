@@ -11,6 +11,18 @@
     {
       "name": "EntryAbility_label",
       "value": "云音乐"
+    },
+    {
+      "name": "permission_read_media",
+      "value": "用于读取媒体文件，上传头像功能需要访问相册"
+    },
+    {
+      "name": "permission_write_media",
+      "value": "用于写入媒体文件，保存用户头像"
+    },
+    {
+      "name": "permission_media_location",
+      "value": "用于访问媒体文件位置信息"
     }
   ]
 }

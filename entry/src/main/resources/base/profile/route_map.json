@@ -31,6 +31,22 @@
       "data": {
         "description": "this is GuidePage"
       }
+    },
+    {
+      "name": "LoginPage",
+      "pageSourceFile": "src/main/ets/pages/LoginPage.ets",
+      "buildFunction" : "LoginPageBuilder",
+      "data": {
+        "description": "this is LoginPage"
+      }
+    },
+    {
+      "name": "RegisterPage",
+      "pageSourceFile": "src/main/ets/pages/RegisterPage.ets",
+      "buildFunction" : "RegisterPageBuilder",
+      "data": {
+        "description": "this is RegisterPage"
+      }
     }
 
   ]

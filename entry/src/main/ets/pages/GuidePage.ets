@@ -61,7 +61,7 @@ export struct GuidePage {
               middle: { anchor: "__container__", align: HorizontalAlign.Center },
             })
             .onClick(()=>{
-              this.pathInfos.replacePathByName("Layout",null,false)
+              this.pathInfos.replacePathByName("LoginPage",null,false)
             })
         }
         .width('100%').height('100%')

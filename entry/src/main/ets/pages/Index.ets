@@ -1,6 +1,7 @@
 import { AppStorageV2 } from '@kit.ArkUI'
 import { SongItemType } from '../models/music';
 import { StorageUtil } from '../utils/StorageUtil';
+import { UserService } from '../utils/UserService';
 
 @Entry
 @Component
@@ -25,8 +26,7 @@ struct Index {
     if (flag) {
       StorageUtil.saveObject<boolean>('isFirst',false)
       this.pathInfos.pushPathByName("GuidePage",null,false)
-    }
-    else{
+    }else{
       this.pathInfos.pushPathByName("Start", null, false)
     }
   }

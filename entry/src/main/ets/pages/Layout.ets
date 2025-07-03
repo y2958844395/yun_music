@@ -1,3 +1,4 @@
+import { UserService } from "../utils/UserService";
 import { Find } from "./Find";
 import { Mine } from "./Mine";
 import { Moment } from "./Moment";
@@ -38,6 +39,19 @@ export struct Layout {
    .justifyContent(FlexAlign.Center)
   }
 
+  async aboutToAppear() {
+    console.log('Layout页面加载完成');
+    // 在这里添加你想要执行的操作
+    // 检查登录状态
+    const isLoggedIn = await UserService.isLoggedIn();
+    console.log(`登录状态：${isLoggedIn}`)
+
+    if (!isLoggedIn) {
+      // 未登录，跳转到登录页
+      this.pathInfos.pushPathByName("LoginPage", null, false)
+    }
+  }
+
   build() {
     NavDestination() {
       Tabs({barPosition:BarPosition.End}){
@@ -50,7 +64,11 @@ export struct Layout {
            }else if (this.CurrentIndex===2) {
              Moment()
            }else if (this.CurrentIndex===3) {
-             Mine()
+             Mine({
+               onNavigateToLogin: () => {
+                 this.pathInfos.pushPathByName("LoginPage", null, false);
+               }
+             })
            }
          }.tabBar(this.tabBuilder(item,index))
          .backgroundColor('#131215')
