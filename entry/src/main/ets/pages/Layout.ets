@@ -96,7 +96,11 @@ export struct Layout {
         .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.TOP, SafeAreaEdge.BOTTOM])
 
         TabContent() {
-          Mine()
+          Mine({
+            onNavigateToLogin: () => {
+              this.pathInfos.pushPathByName("LoginPage", null, false);
+            }
+          })
         }
         .tabBar(this.tabBuilder(this.tabData[3], 3))
         .backgroundColor('#131215')
