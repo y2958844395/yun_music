@@ -55,7 +55,7 @@
         "description": "$string:EntryAbility_desc",
         "icon": "$media:logo1",
         "label": "$string:EntryAbility_label",
-        "startWindowIcon": "$media:logo1",
+        "startWindowIcon": "$media:logo1_01",
         "startWindowBackground": "$color:start_window_background",
         "exported": true,
         "skills": [

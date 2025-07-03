@@ -17,57 +17,42 @@ export struct GuidePage {
     NavDestination() {
       Swiper() {
         RelativeContainer() {
-          Text('欢迎使用云音乐')
-            .width('auto')
-            .height(50)
-              // .border({width:1})
-            .fontSize(30)
-              // .fontFamily("yrt.ttf")
-            .fontColor('#FFD700')
-            .textAlign(TextAlign.Center)
-            .margin({ top: -50 })
-            .alignRules({
-              center: { anchor: "__container__", align: VerticalAlign.Center },
-              middle: { anchor: "__container__", align: HorizontalAlign.Center },
-            })
+          Image($r('app.media.ydy1'))
+            .width('100%')
+            .height('100%')
+            .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.TOP, SafeAreaEdge.BOTTOM])
 
         }
         .width('100%').height('100%')
         .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.TOP, SafeAreaEdge.BOTTOM])
 
         RelativeContainer() {
-          Text('更多惊喜功能等你发现')
-            .width('auto')
-            .height(50)
-            .fontSize(30)
-            .fontColor('#FFD700')
-            .textAlign(TextAlign.Center)
-            .margin({ top: -50 })
-            .alignRules({
-              top: { anchor: "__container__", align: VerticalAlign.Center },
-              middle: { anchor: "__container__", align: HorizontalAlign.Center }
-            })
-            .id("text")
+          Image($r('app.media.ydy2'))
+            .width('100%')
+            .height('100%')
+            .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.TOP, SafeAreaEdge.BOTTOM])
 
-          Button('进入软件')
-            .width('auto')
-            .height(50)
-            .fontSize(30)
-            .fontColor('#fff')
-            .backgroundColor("#FFA500")
-            .margin({ bottom: 100 })
-            .alignRules({
-              bottom: { anchor: "__container__", align: VerticalAlign.Bottom },
-              middle: { anchor: "__container__", align: HorizontalAlign.Center },
-            })
-            .onClick(()=>{
-              this.pathInfos.replacePathByName("LoginPage",null,false)
-            })
+          Button(){
+            Image($r("app.media.button1"))
+          }
+          .width(270)
+          .height(100)
+          .alignRules({
+            bottom: { anchor: "__container__", align: VerticalAlign.Bottom },
+            middle: { anchor: "__container__", align: HorizontalAlign.Center },
+          })
+          .margin({bottom:100})
+          .onClick(()=>{
+            this.pathInfos.replacePathByName("Layout",null,false)
+          })
         }
         .width('100%').height('100%')
         .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.TOP, SafeAreaEdge.BOTTOM])
 
       }
+      .loop(false)
+      .effectMode(EdgeEffect.None)
+      .indicator(new DotIndicator().color('#fff').selectedItemWidth('20'))
       .backgroundColor('#2C2C2C')
       .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.TOP, SafeAreaEdge.BOTTOM])
 

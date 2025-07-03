@@ -238,15 +238,27 @@ export struct Recommend {
                     }, (item: recommendListType) => item.title) // 使用唯一 key
                   }
                   .width('100%')
+                  .height('auto')
+                  // .border({width:2})
+                  // .backgroundColor('#fff86c6c')
+                  // .layoutWeight(1)
                   .justifyContent(FlexAlign.SpaceBetween)
                   .padding(10)
                 }
               }, (rowIndex: number) => rowIndex.toString())
             }
             .scrollBar(BarState.Off)
+            .margin({bottom:35})
+            // .layoutWeight(1)
+            .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.TOP, SafeAreaEdge.BOTTOM])
           }
+          .layoutWeight(1)
+          .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.TOP, SafeAreaEdge.BOTTOM])
+
         }
+        .layoutWeight(1)
         .scrollBar(BarState.Off)
+
       }
       .onRefreshing(() => {
         this.refreshing = true
