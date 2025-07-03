@@ -41,7 +41,7 @@ export struct Layout {
   build() {
     NavDestination() {
       Tabs({barPosition:BarPosition.End}){
-       ForEach(this.tabData,(item:TabClass,index:number)=>{
+       /*ForEach(this.tabData,(item:TabClass,index:number)=>{
          TabContent(){
            if (this.CurrentIndex===0) {
              Recommend()
@@ -55,7 +55,34 @@ export struct Layout {
          }.tabBar(this.tabBuilder(item,index))
          .backgroundColor('#131215')
          .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.TOP, SafeAreaEdge.BOTTOM])
-       })
+       })*/
+        TabContent() {
+          Recommend()
+        }
+        .tabBar(this.tabBuilder(this.tabData[0], 0))
+        .backgroundColor('#131215')
+        .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.TOP, SafeAreaEdge.BOTTOM])
+
+        TabContent() {
+          Find()
+        }
+        .tabBar(this.tabBuilder(this.tabData[1], 1))
+        .backgroundColor('#131215')
+        .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.TOP, SafeAreaEdge.BOTTOM])
+
+        TabContent() {
+          Moment()
+        }
+        .tabBar(this.tabBuilder(this.tabData[2], 2))
+        .backgroundColor('#131215')
+        .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.TOP, SafeAreaEdge.BOTTOM])
+
+        TabContent() {
+          Mine()
+        }
+        .tabBar(this.tabBuilder(this.tabData[3], 3))
+        .backgroundColor('#131215')
+        .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.TOP, SafeAreaEdge.BOTTOM])
       }
       .backgroundColor('#3B3F42')
       .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.TOP, SafeAreaEdge.BOTTOM])
@@ -73,4 +100,5 @@ export struct Layout {
 
   }
 }
+
 
