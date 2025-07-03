@@ -3,10 +3,11 @@ import { UserService } from '../utils/UserService';
 import { ApiResponse, User, UploadResult } from '../models/User';
 import { promptAction } from '@kit.ArkUI';
 import { picker } from '@kit.CoreFileKit';
-import { BASE_URL, HttpUtil } from '../utils/HttpUtil';
+import { BASE_URL, HttpUtil, PreparedFileInfo } from '../utils/HttpUtil';
 import { common } from '@kit.AbilityKit';
 import { rcp } from '@kit.RemoteCommunicationKit';
 import fs from '@ohos.file.fs';
+import { BusinessError } from '@kit.BasicServicesKit';
 
 interface GeneratedTypeLiteralInterface_1 {
   success: boolean;
@@ -21,6 +22,7 @@ interface GeneratedTypeLiteralInterface_2 {
 interface MineProps {
   onNavigateToLogin?: () => void;
 }
+
 @Component
 export struct Mine {
   onNavigateToLogin?: () => void;
@@ -71,117 +73,113 @@ export struct Mine {
     }
   }
 
-  // 选择并上传头像
+  // 【已重构】选择并上传头像
   private async handleAvatarUpload(): Promise<void> {
-    try {
-      this.isUploadingAvatar = true;
+    this.isUploadingAvatar = true;
+    let preparedFile: PreparedFileInfo | null = null; // 用于后续清理
 
-      // 获取context
+    try {
+      // 1. 获取上下文
       const context = getContext(this) as common.UIAbilityContext;
 
-      // 创建文件选择器实例
-      const documentViewPicker = new picker.DocumentViewPicker(context);
+      // 2. 使用文件选择器让用户选择图片
+      const documentViewPicker = new picker.DocumentViewPicker();
       const documentSelectOptions = new picker.DocumentSelectOptions();
       documentSelectOptions.maxSelectNumber = 1;
       documentSelectOptions.fileSuffixFilters = ['.png', '.jpg', '.jpeg'];
-      documentSelectOptions.authMode = true;
-
       const result = await documentViewPicker.select(documentSelectOptions);
 
       if (result && result.length > 0) {
         const fileUri = result[0];
 
-        // 调用上传头像接口
-        const uploadResult = await this.uploadAvatar(fileUri, context);
+        // 3. 【关键步骤】将文件复制到应用缓存，并获取上传所需信息
+        preparedFile = await this.prepareFileForUpload(fileUri, context);
+
+        // 4. 调用上传接口
+        const uploadResult = await this.uploadAvatar(preparedFile, context);
+
         if (uploadResult.success) {
-          promptAction.showToast({
-            message: '头像上传成功',
-            duration: 2000
-          });
-          await this.loadUserInfo();
+          promptAction.showToast({ message: '头像上传成功', duration: 2000 });
+          await this.loadUserInfo(); // 成功后刷新用户信息
         } else {
-          promptAction.showToast({
-            message: uploadResult.message || '头像上传失败',
-            duration: 2000
-          });
+          promptAction.showToast({ message: uploadResult.message || '头像上传失败', duration: 2000 });
         }
       }
     } catch (error) {
-      console.error('选择头像失败:', error);
-      promptAction.showToast({
-        message: '选择头像失败',
-        duration: 2000
-      });
+      const err = error as BusinessError;
+      // 检查是否是用户主动取消选择
+      if (err.code === 1500001) { // 1500001 = 用户取消
+        console.info('User cancelled photo selection.');
+      } else {
+        console.error('选择或上传头像失败:', JSON.stringify(err));
+        promptAction.showToast({ message: '操作失败，请重试', duration: 2000 });
+      }
     } finally {
+      // 5. 【关键步骤】无论成功或失败，都清理缓存中的临时文件
+      if (preparedFile?.copyPath) {
+        try {
+          fs.unlinkSync(preparedFile.copyPath);
+          console.log(`临时文件已删除: ${preparedFile.copyPath}`);
+        } catch (cleanupError) {
+          console.warn('清理缓存文件失败:', cleanupError);
+        }
+      }
       this.isUploadingAvatar = false;
     }
   }
 
-  // 上传头像到服务器
-  private async uploadAvatar(fileUri: string, context: common.UIAbilityContext): Promise<UploadResult> {
+
+  // 【已重构】上传头像到服务器
+  private async uploadAvatar(fileInfo: PreparedFileInfo, context: common.UIAbilityContext): Promise<UploadResult> {
     try {
       const token = await UserService.getToken();
       if (!token) {
         return { success: false, message: '未登录' };
       }
 
-      // 文件处理：拷贝到沙箱目录
-      const fileInfo = await this.prepareFileForUpload(fileUri, context);
+      // 直接调用重构后的 HttpUtil.uploadFile
+      const response = await HttpUtil.uploadFile<ApiResponse>(
+        '/upload-avatar',
+        fileInfo,
+        'avatar', // 后端接收文件的字段名
+        context,
+        token
+      );
 
-      try {
-        const response = await HttpUtil.uploadFileWithHttpRequest(
-          '/upload-avatar',
-          fileInfo.sandboxPath,
-          fileInfo.fileName,
-          'avatar',
-          token
-        );
-
-        if (response.code === 200) {
-          return { success: true, message: '上传成功' };
-        } else {
-          return { success: false, message: response.message || '上传失败' };
-        }
-      } finally {
-        // 清理临时文件
-        try {
-          fs.unlinkSync(fileInfo.copyPath);
-        } catch (cleanupError) {
-          console.warn('清理缓存文件失败:', cleanupError);
-        }
+      if (response.code === 200) {
+        return { success: true, message: '上传成功' };
+      } else {
+        return { success: false, message: response.message || '上传失败' };
       }
     } catch (error) {
-      console.error('上传头像失败:', error);
+      console.error('上传头像网络请求失败:', error);
       return { success: false, message: '网络错误' };
     }
   }
 
-  // 准备文件用于上传
-  private async prepareFileForUpload(fileUri: string, context: common.UIAbilityContext): Promise<GeneratedTypeLiteralInterface_2> {
-    // 获取文件扩展名
-    const fileExtension = fileUri.split('.').pop() || 'jpg';
-    const fileName = Date.now() + '.' + fileExtension;
+  // 【已重构】准备文件用于上传 (复制到缓存)
+  private async prepareFileForUpload(fileUri: string, context: common.UIAbilityContext): Promise<PreparedFileInfo> {
+    // 1. 生成唯一的文件名
+    const lastDotIndex = fileUri.lastIndexOf('.');
+    const fileExtension = (lastDotIndex !== -1) ? fileUri.substring(lastDotIndex + 1) : 'jpg';
+    const fileName = `${Date.now()}.${fileExtension}`;
 
-    // 拷贝到缓存目录的完整路径
-    const copyPath = context.cacheDir + '/' + fileName;
+    // 2. 定义目标路径
+    const copyPath = `${context.cacheDir}/${fileName}`; // 缓存目录中的完整物理路径
+    const sandboxPath = `internal://cache/${fileName}`; // 用于上传的内部URI
 
-    // 构造沙箱路径（用于上传）
-    const sandboxPath = 'internal://cache/' + fileName;
-
-    // 打开原文件并拷贝
+    // 3. 执行文件复制
     const file = fs.openSync(fileUri, fs.OpenMode.READ_ONLY);
     try {
       fs.copyFileSync(file.fd, copyPath);
+      console.log(`文件已拷贝到缓存: ${copyPath}`);
     } finally {
-      fs.closeSync(file);
+      fs.closeSync(file); // 确保文件句柄被关闭
     }
 
-    return {
-      copyPath,
-      sandboxPath,
-      fileName
-    };
+    return { copyPath, sandboxPath, fileName };
   }
+
   // 验证资料编辑输入
   private validateProfileInput(): boolean {
     if (!this.editNickname.trim()) {
