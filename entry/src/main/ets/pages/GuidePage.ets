@@ -52,6 +52,7 @@ export struct GuidePage {
       }
       .loop(false)
       .effectMode(EdgeEffect.None)
+      .indicator(new DotIndicator().color('#fff').selectedItemWidth('20'))
       .backgroundColor('#2C2C2C')
       .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.TOP, SafeAreaEdge.BOTTOM])
 

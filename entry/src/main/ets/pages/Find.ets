@@ -195,8 +195,8 @@ export struct Find {
             .height(80)
             // .backgroundColor(Color.Pink)
             .margin({ bottom: 10 })
-          }.onClick(()=>{
-
+          }
+          .onClick(()=>{
             this.pathInfos.pushPathByName('Play',null,false)
             playerManager.singPlay(item)
           })
@@ -204,6 +204,7 @@ export struct Find {
       }
       .scrollBar(BarState.Off)
       .layoutWeight(1)
+      .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.TOP, SafeAreaEdge.BOTTOM])
     }
     .width('100%')
     .height('100%')
